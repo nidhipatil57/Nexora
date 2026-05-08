@@ -11,22 +11,26 @@ export async function POST(req: NextRequest) {
     const { careerId, careerTitle } = await req.json();
 
     const profile = await prisma.profile.findUnique({ where: { userId: auth.userId } });
-    const userSkills = profile?.skills || "[]";
-    const userInterests = profile?.interests || "[]";
+    const userSkills = profile?.skills ? JSON.parse(profile.skills) : [];
+    const userInterests = profile?.interests ? JSON.parse(profile.interests) : [];
 
-    const prompt = `Act as a world-class career coach and educational architect. Create a high-fidelity, extremely detailed 5-phase career roadmap for becoming a "${careerTitle}". 
+    const prompt = `Act as a senior career strategist and educational architect. Create an EXTREMELY DETAILED, high-fidelity 5-year career roadmap for becoming a "${careerTitle}". 
     
-    For each year (1 to 5), you MUST provide:
-    1. title: A professional name for this stage (e.g., "Foundations & Core Logic").
-    2. desc: A very detailed (4-5 sentences) educational overview of WHAT to learn this year, WHY it is the priority, and HOW it connects to the next stage.
-    3. milestones: Exactly 5 very specific, actionable milestones (e.g., "Master React Context API and Redux for complex state management" instead of "Learn state management").
-    4. skills: 4 key technical or soft skills to master this year.
+    Context about the user:
+    - Current Skills: ${userSkills.join(", ")}
+    - Interests: ${userInterests.join(", ")}
 
-    The tone should be encouraging, professional, and deeply insightful. Focus on mastery, not just exposure. 
+    For each year (1 to 5), you MUST provide:
+    1. title: A professional, inspiring name for this stage.
+    2. desc: A massive, detailed analysis (at least 8-10 sentences). Cover the technical stacks to master, the industry concepts to understand, the soft skills to develop, and how this year specifically prepares them for the massive jump in the following year. Be very specific about tools, frameworks, and methodologies.
+    3. milestones: Exactly 5 very specific, actionable, and difficult milestones (e.g., "Build and deploy a distributed database system using Go and Raft consensus" instead of "Learn backend").
+    4. skills: 5-6 advanced technical or strategic skills to master this year.
+
+    The tone should be that of an elite mentor. Do NOT provide generic advice. Provide specific, company-ready, expert-level guidance.
     
     Respond ONLY with a valid JSON array of objects: [{"year":1, "title":"...", "desc":"...", "milestones":["..."], "skills":["..."]}, ...]`;
 
-    const aiResponse = await generateAIResponse(prompt, "You are a professional career educational architect. Your output must be a highly detailed JSON array.");
+    const aiResponse = await generateAIResponse(prompt, "You are a senior career educational architect. Your output must be a professional, high-density, and hyper-detailed JSON array.");
 
     let milestones;
     try {
