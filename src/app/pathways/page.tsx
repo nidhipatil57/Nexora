@@ -167,7 +167,11 @@ export default function PathwaysPage() {
                       <span className="text-[10px] font-black uppercase tracking-widest text-cyan-400">{phase?.title}</span>
                     </div>
                     
-                    <div className="mt-8 max-w-2xl">
+                    <p className="text-slate-400 text-sm leading-relaxed mb-8 max-w-xl">
+                      {phase?.desc}
+                    </p>
+                    
+                    <div className="mt-4 max-w-2xl">
                       {/* Milestones */}
                       <div className="space-y-4">
                         <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Key Milestones</span>
@@ -180,6 +184,20 @@ export default function PathwaysPage() {
                           ))}
                         </ul>
                       </div>
+
+                      {/* Skills */}
+                      {phase?.skills && phase.skills.length > 0 && (
+                        <div className="mt-8 pt-8 border-t border-white/5">
+                          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-4 block">Target Skills</span>
+                          <div className="flex flex-wrap gap-2">
+                            {phase.skills.map((skill: string, j: number) => (
+                              <span key={j} className="px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-medium">
+                                {skill}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>

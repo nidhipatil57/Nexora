@@ -97,13 +97,15 @@ export default function MentorPage() {
     setActiveSessionId(sessionId);
     setLoading(true);
     try {
-      const res = await fetch(`/api/chat?sessionId=${sessionId}`, { headers: { Authorization: `Bearer ${token}` } });
+      const res = await fetch(`/api/chat?sessionId=${sessionId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
       const data = await res.json();
       if (data.success) {
         setMessages(data.messages);
       }
-    } catch (e) {
-      console.error(e);
+    } catch (error) {
+      console.error(error);
     } finally {
       setLoading(false);
     }
@@ -125,7 +127,10 @@ export default function MentorPage() {
     const sessionId = sessionToDelete.id;
     setSessionToDelete(null);
     try {
-      const res = await fetch(`/api/chat/${sessionId}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } });
+      const res = await fetch(`/api/chat?sessionId=${sessionId}`, { 
+        method: "DELETE", 
+        headers: { Authorization: `Bearer ${token}` } 
+      });
       const data = await res.json();
       if (data.success) {
         setSessions(prev => prev.filter(s => s.id !== sessionId));

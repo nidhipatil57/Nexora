@@ -44,12 +44,10 @@ export async function POST(req: NextRequest) {
       sessionId = session.id;
     }
 
-    // Save user message
     await prisma.chatMessage.create({
       data: { sessionId, userId: auth.userId, role: "user", content: message },
     });
 
-    // Get conversation history
     const history = await prisma.chatMessage.findMany({
       where: { sessionId },
       orderBy: { createdAt: "desc" },
@@ -57,10 +55,7 @@ export async function POST(req: NextRequest) {
     });
 
     const context = history.reverse().map(m => `${m.role}: ${m.content}`).join("\n");
-    const prompt = `You are the Nexora AI Career Mentor. Be helpful, professional, and encouraging. 
-    Context:\n${context}\n\nAssistant:`;
-
-    const aiResponse = await generateAIResponse(prompt, "You are a career mentor. Help the user with their career goals.");
+    const aiResponse = await generateAIResponse(message, `Context:\n${context}\n\nYou are a career mentor.`);
 
     const botMessage = await prisma.chatMessage.create({
       data: { sessionId, userId: auth.userId, role: "assistant", content: aiResponse },
@@ -73,7 +68,48 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true, message: botMessage, sessionId });
   } catch (error) {
-    console.error(error);
-    return NextResponse.json({ success: false, error: "AI Mentor is temporarily unavailable" }, { status: 500 });
+    return NextResponse.json({ success: false, error: "AI Error" }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: NextRequest) {
+  try {
+    const auth = getUserFromRequest(req);
+    if (!auth) return NextResponse.json({ success: false }, { status: 401 });
+
+    const { searchParams } = new URL(req.url);
+    const sessionId = searchParams.get("sessionId");
+
+    if (!sessionId) return NextResponse.json({ success: false }, { status: 400 });
+
+    await prisma.chatSession.delete({
+      where: { id: sessionId, userId: auth.userId }
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (e) {
+    return NextResponse.json({ success: false }, { status: 500 });
+  }
+}
+
+export async function PATCH(req: NextRequest) {
+  try {
+    const auth = getUserFromRequest(req);
+    if (!auth) return NextResponse.json({ success: false }, { status: 401 });
+
+    const { searchParams } = new URL(req.url);
+    const sessionId = searchParams.get("sessionId");
+    const { title } = await req.json();
+
+    if (!sessionId) return NextResponse.json({ success: false }, { status: 400 });
+
+    await prisma.chatSession.update({
+      where: { id: sessionId, userId: auth.userId },
+      data: { title }
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (e) {
+    return NextResponse.json({ success: false }, { status: 500 });
   }
 }

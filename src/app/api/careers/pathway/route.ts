@@ -14,11 +14,19 @@ export async function POST(req: NextRequest) {
     const userSkills = profile?.skills || "[]";
     const userInterests = profile?.interests || "[]";
 
-    const prompt = `Create a 5-phase career roadmap for becoming a "${careerTitle}". 
-    For each year (1 to 5), provide a specific title, a description, and 3 clear milestones.
-    Respond ONLY with a JSON array: [{"year":1, "title":"Foundations", "desc":"Description", "milestones":["Goal 1","Goal 2","Goal 3"], "skills":["Skill 1","Skill 2"]}, ...]`;
+    const prompt = `Act as a world-class career coach and educational architect. Create a high-fidelity, extremely detailed 5-phase career roadmap for becoming a "${careerTitle}". 
+    
+    For each year (1 to 5), you MUST provide:
+    1. title: A professional name for this stage (e.g., "Foundations & Core Logic").
+    2. desc: A very detailed (4-5 sentences) educational overview of WHAT to learn this year, WHY it is the priority, and HOW it connects to the next stage.
+    3. milestones: Exactly 5 very specific, actionable milestones (e.g., "Master React Context API and Redux for complex state management" instead of "Learn state management").
+    4. skills: 4 key technical or soft skills to master this year.
 
-    const aiResponse = await generateAIResponse(prompt, "JSON only. Must include milestones array.");
+    The tone should be encouraging, professional, and deeply insightful. Focus on mastery, not just exposure. 
+    
+    Respond ONLY with a valid JSON array of objects: [{"year":1, "title":"...", "desc":"...", "milestones":["..."], "skills":["..."]}, ...]`;
+
+    const aiResponse = await generateAIResponse(prompt, "You are a professional career educational architect. Your output must be a highly detailed JSON array.");
 
     let milestones;
     try {
