@@ -57,9 +57,13 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    // Store recommendations with career entries
+    // Store recommendations with career entries (De-duplicated)
     const stored = [];
+    const seenTitles = new Set();
+    
     for (const rec of recommendations) {
+      if (seenTitles.has(rec.title)) continue;
+      seenTitles.add(rec.title);
       let career = await prisma.career.findFirst({ where: { title: rec.title } });
       if (!career) {
         career = await prisma.career.create({
