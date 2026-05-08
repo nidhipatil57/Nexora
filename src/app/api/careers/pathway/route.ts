@@ -14,38 +14,25 @@ export async function POST(req: NextRequest) {
     const userSkills = profile?.skills || "[]";
     const userInterests = profile?.interests || "[]";
 
-    const prompt = `Generate a detailed 5-year career pathway for becoming a "${careerTitle}". 
-The user has these skills: ${userSkills} and interests: ${userInterests}.
+    const prompt = `Generate a 5-phase career roadmap for "${careerTitle}". 
+Include specific milestones and skills for each year. 
+User skills: ${userSkills}.
+Respond ONLY with a JSON array of 5 objects: [{"year":1,"title":"...","desc":"...","milestones":["..."],"skills":["..."]}, ...]`;
 
-Create exactly 5 phases, one for each individual year: Year 1, Year 2, Year 3, Year 4, and Year 5.
-For each year, provide:
-1. title: A specific phase title (e.g., "Junior Implementation").
-2. desc: What they should achieve.
-3. milestones: 3 specific goals for that year.
-4. skills: 4-5 unique skills that advance from previous years (e.g., Year 1: Basic React, Year 2: Advanced React & State Management).
-
-Respond ONLY with a valid JSON array of 5 objects:
-[
-  { "year": "1", "title": "Foundation", "desc": "...", "milestones": ["..."], "skills": ["..."] },
-  ...
-  { "year": "5", "title": "Expertise", "desc": "...", "milestones": ["..."], "skills": ["..."] }
-]`;
-
-    const aiResponse = await generateAIResponse(prompt, "You are a career pathway expert. Respond ONLY with valid JSON arrays of 5 objects. No markdown.");
+    const aiResponse = await generateAIResponse(prompt, "JSON only. No markdown. Fast response.");
 
     let milestones;
     try {
       const cleaned = aiResponse.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
       milestones = JSON.parse(cleaned);
     } catch {
-      milestones = Array.from({ length: 5 }, (_, i) => ({
-        year: (i + 1).toString(),
-        title: i === 0 ? "Entry Level" : i < 3 ? "Growth Phase" : "Mastery",
-        desc: `Strategic growth plan for year ${i + 1}`,
-        status: i === 0 ? "current" : "future",
-        milestones: [`Key objective for year ${i + 1}`, `Networking goal ${i + 1}`, `Skill acquisition target ${i + 1}`],
-        skills: i === 0 ? ["Foundations"] : ["Advanced Concepts"]
-      }));
+      milestones = [
+        { year: 1, title: "Foundations", desc: "Building the core expertise", milestones: ["Establish basics", "Network", "Get certified"], skills: ["Core Tech", "Soft Skills"] },
+        { year: 2, title: "Growth", desc: "Expanding scope and responsibility", milestones: ["Lead small project", "Advanced cert", "Contribute to OSS"], skills: ["System Design", "Cloud"] },
+        { year: 3, title: "Specialization", desc: "Becoming a subject matter expert", milestones: ["Mentor others", "Speak at event", "Design architecture"], skills: ["Deep Tech", "Strategy"] },
+        { year: 4, title: "Leadership", desc: "Strategic impact and vision", milestones: ["Strategic planning", "Cross-team lead", "Major delivery"], skills: ["Leadership", "Budgeting"] },
+        { year: 5, title: "Mastery", desc: "Industry recognition", milestones: ["Thought leadership", "Executive influence", "Global impact"], skills: ["Executive Presence", "Innovation"] }
+      ];
     }
 
     const pathway = await prisma.careerPathway.create({
