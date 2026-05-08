@@ -1,23 +1,46 @@
-export async function generateAIResponse(prompt: string, systemInstruction?: string): Promise<string> {
+export async function generateAIResponse(prompt: string | any[], systemInstruction?: string): Promise<string> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return "ERROR: No API Key found in .env file.";
 
-  // Use the EXACT models found in your account's allowed list
   const models = [
     "models/gemini-2.0-flash",
     "models/gemini-flash-latest",
-    "models/gemini-2.0-flash-lite",
-    "models/gemini-3.1-flash-lite"
+    "models/gemini-2.0-flash-lite"
   ];
 
   for (const model of models) {
     try {
+      let contents: any[] = [];
+      
+      if (Array.isArray(prompt)) {
+        // Handle chat history array
+        contents = prompt.map(m => ({
+          role: m.role === "assistant" ? "model" : "user",
+          parts: [{ text: m.content }]
+        }));
+        
+        // Add system instruction if provided
+        if (systemInstruction) {
+          contents.unshift({
+            role: "user",
+            parts: [{ text: `SYSTEM INSTRUCTION: ${systemInstruction}` }]
+          });
+          contents.push({
+            role: "model",
+            parts: [{ text: "Understood. I will follow those instructions." }]
+          });
+        }
+      } else {
+        // Handle single prompt string
+        contents = [{ 
+          parts: [{ text: systemInstruction ? `${systemInstruction}\n\n${prompt}` : prompt }] 
+        }];
+      }
+
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/${model}:generateContent?key=${apiKey}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: systemInstruction ? `${systemInstruction}\n\n${prompt}` : prompt }] }]
-        })
+        body: JSON.stringify({ contents })
       });
       
       const data = await response.json();
@@ -26,11 +49,12 @@ export async function generateAIResponse(prompt: string, systemInstruction?: str
         return cleanAIResponse(data.candidates[0].content.parts[0].text);
       }
     } catch (e) {
+      console.error(`AI Model ${model} failed:`, e);
       continue;
     }
   }
 
-  return "I'm here to help you navigate your career journey! Tell me about your goals and I'll do my best to guide you.";
+  return "I'm ready to help you with your career! What specifically would you like to discuss next?";
 }
 
 function cleanAIResponse(text: string): string {
@@ -71,6 +95,5 @@ export async function chatWithMentor(messages: Array<{role: string; content: str
     resume: "You are a resume reviewer. Respond in plain text ONLY.",
     interview: "You are an interview coach. Respond in plain text ONLY.",
   };
-  const lastMessage = messages[messages.length - 1];
-  return generateAIResponse(lastMessage.content, modeInstructions[mode] || modeInstructions.general);
+  return generateAIResponse(messages, modeInstructions[mode] || modeInstructions.general);
 }
