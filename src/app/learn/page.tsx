@@ -4,6 +4,13 @@ import { BookOpen, Video, PlayCircle, ExternalLink, Star, Clock, CheckCircle2, C
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuthStore } from "@/store";
 
+declare global {
+  interface Window {
+    YT: any;
+    onYouTubeIframeAPIReady: () => void;
+  }
+}
+
 import { curatedCourses, Course } from "./courses";
 
 export default function LearnPage() {
