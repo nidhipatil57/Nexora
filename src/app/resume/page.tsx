@@ -67,19 +67,19 @@ export default function ResumePage() {
     printWindow.document.write(`<html><head><title>${form.name} - Resume</title><style>
       @page { size: A4; margin: 0; }
       body{font-family:system-ui,-apple-system,sans-serif;margin:0;padding:0;color:#1a1a2e;line-height:1.4;background:#fff}
-      .container{display:flex;min-height:297mm;width:210mm;margin:0 auto;box-sizing:border-box}
-      .sidebar{width:260px;min-width:260px;background:#f0f2f5;padding:40px 25px;border-right:1px solid #ddd;box-sizing:border-box}
-      .main{flex:1;background:white;min-width:0;box-sizing:border-box}
-      .header{background:#2c3e50;color:white;padding:40px 50px;text-align:left}
-      .content{padding:40px 50px}
-      .section{position:relative;padding-left:30px;margin-bottom:30px;border-left:1px solid #ddd}
-      .dot{position:absolute;left:-6px;top:4px;width:10px;height:10px;background:#2c3e50;border-radius:50%}
+      .res-container{display:flex;min-height:297mm;width:210mm;margin:0 auto;box-sizing:border-box;position:relative}
+      .res-sidebar{width:260px;min-width:260px;background:#f0f2f5;padding:40px 25px;border-right:1px solid #ddd;box-sizing:border-box}
+      .res-main{flex:1;background:white;min-width:0;box-sizing:border-box}
+      .res-header{background:#2c3e50;color:white;padding:40px 50px;text-align:left}
+      .res-content{padding:40px 50px}
+      .res-section{position:relative;padding-left:30px;margin-bottom:30px;border-left:1px solid #ddd}
+      .res-dot{position:absolute;left:-6px;top:4px;width:10px;height:10px;background:#2c3e50;border-radius:50%}
       h1{font-size:28px;margin:0;text-transform:uppercase;letter-spacing:1px;line-height:1.2}
       h2{font-size:13px;text-transform:uppercase;letter-spacing:1px;color:#2c3e50;margin-bottom:12px;border-bottom:1.5px solid #2c3e50;display:inline-block;padding-bottom:2px}
-      .sidebar-title{font-size:11px;font-weight:bold;text-transform:uppercase;border-bottom:1px solid #ccc;margin-bottom:12px;padding-bottom:4px;color:#333}
-      .text-small{font-size:10.5px;color:#555;margin-bottom:8px;word-break:break-word}
-      .item-title{font-weight:bold;font-size:13px;color:#1a1a2e}
-      .item-subtitle{font-size:11px;color:#666;margin-bottom:5px}
+      .res-sidebar-title{font-size:11px;font-weight:bold;text-transform:uppercase;border-bottom:1px solid #ccc;margin-bottom:12px;padding-bottom:4px;color:#333}
+      .res-text-small{font-size:10.5px;color:#555;margin-bottom:8px;word-break:break-word}
+      .res-item-title{font-weight:bold;font-size:13px;color:#1a1a2e}
+      .res-item-subtitle{font-size:11px;color:#666;margin-bottom:5px}
       ul{margin:5px 0;padding-left:18px}li{font-size:11.5px;margin:4px 0;color:#444}
     </style></head><body>${previewRef.current.innerHTML}</body></html>`);
     printWindow.document.close();
@@ -173,55 +173,55 @@ export default function ResumePage() {
 
           <div className="glass-card p-1 bg-slate-900/50 shadow-2xl overflow-x-auto">
             <div ref={previewRef} className="bg-white rounded shadow-2xl text-slate-800 overflow-hidden mx-auto" style={{ width: '210mm', minHeight: '297mm' }} contentEditable={editing} suppressContentEditableWarning>
-              <div className="container" style={{ display: 'flex', minHeight: '297mm', width: '100%' }}>
+              <div className="res-container" style={{ display: 'flex', minHeight: '297mm', width: '100%', position: 'relative' }}>
                 {/* Sidebar */}
-                <div className="sidebar" style={{ width: '260px', minWidth: '260px', background: '#f0f2f5', padding: '40px 25px', borderRight: '1px solid #ddd', boxSizing: 'border-box' }}>
+                <div className="res-sidebar" style={{ width: '260px', minWidth: '260px', background: '#f0f2f5', padding: '40px 25px', borderRight: '1px solid #ddd', boxSizing: 'border-box' }}>
                   <div style={{ width: '110px', height: '110px', borderRadius: '50%', background: '#ddd', margin: '0 auto 35px', border: '4px solid #fff', boxShadow: '0 4px 10px rgba(0,0,0,0.05)' }} />
                   
                   <div style={{ marginBottom: '35px' }}>
-                    <div className="sidebar-title" style={{ fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', borderBottom: '1px solid #ccc', marginBottom: '12px', paddingBottom: '4px', color: '#333' }}>Contact</div>
-                    <div className="text-small" style={{ fontSize: '10.5px', marginBottom: '8px', color: '#555' }}>📞 {form.phone}</div>
-                    <div className="text-small" style={{ fontSize: '10.5px', marginBottom: '8px', color: '#555' }}>✉️ {form.email}</div>
-                    <div className="text-small" style={{ fontSize: '10.5px', marginBottom: '8px', color: '#555' }}>📍 {form.location}</div>
+                    <div className="res-sidebar-title" style={{ fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', borderBottom: '1px solid #ccc', marginBottom: '12px', paddingBottom: '4px', color: '#333' }}>Contact</div>
+                    <div className="res-text-small" style={{ fontSize: '10.5px', marginBottom: '8px', color: '#555' }}>📞 {form.phone}</div>
+                    <div className="res-text-small" style={{ fontSize: '10.5px', marginBottom: '8px', color: '#555' }}>✉️ {form.email}</div>
+                    <div className="res-text-small" style={{ fontSize: '10.5px', marginBottom: '8px', color: '#555' }}>📍 {form.location}</div>
                   </div>
 
                   {resumeData.languages?.length > 0 && (
                     <div style={{ marginBottom: '35px' }}>
-                      <div className="sidebar-title" style={{ fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', borderBottom: '1px solid #ccc', marginBottom: '12px', paddingBottom: '4px', color: '#333' }}>Languages</div>
-                      {resumeData.languages.map(l => <div key={l} className="text-small" style={{ fontSize: '10.5px' }}>• {l}</div>)}
+                      <div className="res-sidebar-title" style={{ fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', borderBottom: '1px solid #ccc', marginBottom: '12px', paddingBottom: '4px', color: '#333' }}>Languages</div>
+                      {resumeData.languages.map(l => <div key={l} className="res-text-small" style={{ fontSize: '10.5px' }}>• {l}</div>)}
                     </div>
                   )}
 
                   {resumeData.skills?.length > 0 && (
                     <div style={{ marginBottom: '35px' }}>
-                      <div className="sidebar-title" style={{ fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', borderBottom: '1px solid #ccc', marginBottom: '12px', paddingBottom: '4px', color: '#333' }}>Core Skills</div>
-                      {resumeData.skills.map(s => <div key={s} className="text-small" style={{ fontSize: '10.5px', marginBottom: '6px' }}>• {s}</div>)}
+                      <div className="res-sidebar-title" style={{ fontSize: '11px', fontWeight: 'bold', textTransform: 'uppercase', borderBottom: '1px solid #ccc', marginBottom: '12px', paddingBottom: '4px', color: '#333' }}>Core Skills</div>
+                      {resumeData.skills.map(s => <div key={s} className="res-text-small" style={{ fontSize: '10.5px', marginBottom: '6px' }}>• {s}</div>)}
                     </div>
                   )}
                 </div>
 
                 {/* Main Content */}
-                <div className="main" style={{ flex: 1, background: 'white', minWidth: 0, boxSizing: 'border-box' }}>
-                  <div className="header" style={{ background: '#2c3e50', color: 'white', padding: '45px 50px' }}>
+                <div className="res-main" style={{ flex: 1, background: 'white', minWidth: 0, boxSizing: 'border-box' }}>
+                  <div className="res-header" style={{ background: '#2c3e50', color: 'white', padding: '45px 50px' }}>
                     <h1 style={{ fontSize: '30px', margin: 0, textTransform: 'uppercase', letterSpacing: '1.5px', lineHeight: '1.2' }}>{form.name}</h1>
                     <div style={{ fontSize: '14px', textTransform: 'uppercase', opacity: 0.8, marginTop: '8px', letterSpacing: '1px' }}>Professional Candidate</div>
                   </div>
 
-                  <div className="content" style={{ padding: '40px 50px' }}>
-                    <div className="section" style={{ position: 'relative', paddingLeft: '30px', marginBottom: '35px', borderLeft: '1px solid #ddd' }}>
-                      <div className="dot" style={{ position: 'absolute', left: '-6px', top: '4px', width: '10px', height: '10px', background: '#2c3e50', borderRadius: '50%' }} />
+                  <div className="res-content" style={{ padding: '40px 50px' }}>
+                    <div className="res-section" style={{ position: 'relative', paddingLeft: '30px', marginBottom: '35px', borderLeft: '1px solid #ddd' }}>
+                      <div className="res-dot" style={{ position: 'absolute', left: '-6px', top: '4px', width: '10px', height: '10px', background: '#2c3e50', borderRadius: '50%' }} />
                       <h2 style={{ fontSize: '13px', textTransform: 'uppercase', borderBottom: '1.5px solid #2c3e50', marginBottom: '12px', display: 'inline-block', paddingBottom: '2px' }}>Career Objective</h2>
                       <p style={{ fontSize: '11.5px', color: '#333', lineHeight: '1.6' }}>{resumeData.summary}</p>
                     </div>
 
                     {resumeData.experience?.length > 0 && (
-                      <div className="section" style={{ position: 'relative', paddingLeft: '30px', marginBottom: '35px', borderLeft: '1px solid #ddd' }}>
-                        <div className="dot" style={{ position: 'absolute', left: '-6px', top: '4px', width: '10px', height: '10px', background: '#2c3e50', borderRadius: '50%' }} />
+                      <div className="res-section" style={{ position: 'relative', paddingLeft: '30px', marginBottom: '35px', borderLeft: '1px solid #ddd' }}>
+                        <div className="res-dot" style={{ position: 'absolute', left: '-6px', top: '4px', width: '10px', height: '10px', background: '#2c3e50', borderRadius: '50%' }} />
                         <h2 style={{ fontSize: '13px', textTransform: 'uppercase', borderBottom: '1.5px solid #2c3e50', marginBottom: '12px', display: 'inline-block', paddingBottom: '2px' }}>Professional Experience</h2>
                         {resumeData.experience.map((exp, i) => (
                           <div key={i} style={{ marginBottom: '20px' }}>
-                            <div className="item-title" style={{ fontWeight: 'bold', fontSize: '13px', color: '#1a1a2e' }}>{exp.title} | {exp.company}</div>
-                            <div className="item-subtitle" style={{ fontSize: '11px', color: '#666', margin: '2px 0 6px' }}>{exp.period}</div>
+                            <div className="res-item-title" style={{ fontWeight: 'bold', fontSize: '13px', color: '#1a1a2e' }}>{exp.title} | {exp.company}</div>
+                            <div className="res-item-subtitle" style={{ fontSize: '11px', color: '#666', margin: '2px 0 6px' }}>{exp.period}</div>
                             <ul style={{ paddingLeft: '18px' }}>
                               {exp.bullets.map((b, j) => <li key={j} style={{ fontSize: '11.5px', color: '#444', marginBottom: '4px' }}>{b}</li>)}
                             </ul>
@@ -230,24 +230,24 @@ export default function ResumePage() {
                       </div>
                     )}
 
-                    <div className="section" style={{ position: 'relative', paddingLeft: '30px', marginBottom: '35px', borderLeft: '1px solid #ddd' }}>
-                      <div className="dot" style={{ position: 'absolute', left: '-6px', top: '4px', width: '10px', height: '10px', background: '#2c3e50', borderRadius: '50%' }} />
+                    <div className="res-section" style={{ position: 'relative', paddingLeft: '30px', marginBottom: '35px', borderLeft: '1px solid #ddd' }}>
+                      <div className="res-dot" style={{ position: 'absolute', left: '-6px', top: '4px', width: '10px', height: '10px', background: '#2c3e50', borderRadius: '50%' }} />
                       <h2 style={{ fontSize: '13px', textTransform: 'uppercase', borderBottom: '1.5px solid #2c3e50', marginBottom: '12px', display: 'inline-block', paddingBottom: '2px' }}>Education</h2>
                       {resumeData.education.map((edu, i) => (
                         <div key={i} style={{ marginBottom: '12px' }}>
-                          <div className="item-title" style={{ fontWeight: 'bold', fontSize: '13px', color: '#1a1a2e' }}>{edu.degree}</div>
-                          <div className="item-subtitle" style={{ fontSize: '11.5px', color: '#666' }}>{edu.institution} | {edu.year}</div>
+                          <div className="res-item-title" style={{ fontWeight: 'bold', fontSize: '13px', color: '#1a1a2e' }}>{edu.degree}</div>
+                          <div className="res-item-subtitle" style={{ fontSize: '11.5px', color: '#666' }}>{edu.institution} | {edu.year}</div>
                         </div>
                       ))}
                     </div>
 
                     {resumeData.projects?.length > 0 && (
-                      <div className="section" style={{ position: 'relative', paddingLeft: '30px', borderLeft: '1px solid #ddd' }}>
-                        <div className="dot" style={{ position: 'absolute', left: '-6px', top: '4px', width: '10px', height: '10px', background: '#2c3e50', borderRadius: '50%' }} />
+                      <div className="res-section" style={{ position: 'relative', paddingLeft: '30px', borderLeft: '1px solid #ddd' }}>
+                        <div className="res-dot" style={{ position: 'absolute', left: '-6px', top: '4px', width: '10px', height: '10px', background: '#2c3e50', borderRadius: '50%' }} />
                         <h2 style={{ fontSize: '13px', textTransform: 'uppercase', borderBottom: '1.5px solid #2c3e50', marginBottom: '12px', display: 'inline-block', paddingBottom: '2px' }}>Academic Projects</h2>
                         {resumeData.projects.map((p, i) => (
                           <div key={i} style={{ marginBottom: '15px' }}>
-                            <div className="item-title" style={{ fontWeight: 'bold', fontSize: '13px', color: '#1a1a2e' }}>{p.name}</div>
+                            <div className="res-item-title" style={{ fontWeight: 'bold', fontSize: '13px', color: '#1a1a2e' }}>{p.name}</div>
                             <p style={{ fontSize: '11.5px', color: '#555', margin: '4px 0', lineHeight: '1.5' }}>{p.description}</p>
                           </div>
                         ))}
