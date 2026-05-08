@@ -8,7 +8,8 @@ export async function GET(req: NextRequest) {
     const auth = getUserFromRequest(req);
     if (!auth) return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
 
-    // Check for existing recommendations
+    // CACHE BUSTER: 2026-05-09-00-24
+    // Check for existing recommendations (and de-duplicate just in case)
     const existing = await prisma.careerRecommendation.findMany({
       where: { userId: auth.userId },
       include: { career: true },
@@ -16,7 +17,16 @@ export async function GET(req: NextRequest) {
     });
 
     if (existing.length > 0) {
-      return NextResponse.json({ success: true, recommendations: existing });
+      // Safety Shield: Only return unique titles
+      const unique = [];
+      const seen = new Set();
+      for (const item of existing) {
+        if (!seen.has(item.career.title)) {
+          seen.add(item.career.title);
+          unique.push(item);
+        }
+      }
+      return NextResponse.json({ success: true, recommendations: unique });
     }
 
     // Generate new recommendations
