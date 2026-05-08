@@ -63,7 +63,7 @@ export default function LearnPage() {
 
   // Load YouTube IFrame API
   useEffect(() => {
-    if (!window.YT) {
+    if (!(window as any).YT) {
       const tag = document.createElement("script");
       tag.src = "https://www.youtube.com/iframe_api";
       const firstScriptTag = document.getElementsByTagName("script")[0];
@@ -98,11 +98,11 @@ export default function LearnPage() {
   };
 
   useEffect(() => {
-    if (selectedCourse && window.YT) {
+    if (selectedCourse && (window as any).YT) {
       const videoId = extractVideoId(selectedCourse.url);
       if (!videoId) return;
 
-      const newPlayer = new window.YT.Player("youtube-player", {
+      const newPlayer = new (window as any).YT.Player("youtube-player", {
         videoId: videoId,
         playerVars: {
           start: Math.floor(selectedCourse.lastTime || 0),
@@ -110,11 +110,11 @@ export default function LearnPage() {
         },
         events: {
           onStateChange: (event: any) => {
-            if (event.data === window.YT.PlayerState.ENDED) {
+            if (event.data === (window as any).YT.PlayerState.ENDED) {
               saveProgress(selectedCourse.id, 100, 0);
               setTimeout(() => setSelectedCourse(null), 2000);
             }
-            if (event.data === window.YT.PlayerState.PAUSED) {
+            if (event.data === (window as any).YT.PlayerState.PAUSED) {
               const time = event.target.getCurrentTime();
               const duration = event.target.getDuration();
               const percent = Math.floor((time / duration) * 100);
