@@ -50,12 +50,18 @@ export async function POST(req: NextRequest) {
 
     const history = await prisma.chatMessage.findMany({
       where: { sessionId },
-      orderBy: { createdAt: "desc" },
-      take: 10,
+      orderBy: { createdAt: "asc" }, // Get in chronological order
+      take: 15,
     });
 
-    const context = history.reverse().map(m => `${m.role}: ${m.content}`).join("\n");
-    const aiResponse = await generateAIResponse(message, `Context:\n${context}\n\nYou are a career mentor.`);
+    const messagesForAI = history.map(m => ({
+      role: m.role,
+      content: m.content
+    }));
+
+    // Use the specialized chatWithMentor function for clean, smart responses
+    const { chatWithMentor } = await import("@/lib/ai");
+    const aiResponse = await chatWithMentor(messagesForAI, "general");
 
     const botMessage = await prisma.chatMessage.create({
       data: { sessionId, userId: auth.userId, role: "assistant", content: aiResponse },
