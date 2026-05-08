@@ -1,0 +1,280 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String                 @id @default(uuid())
+  email           String                 @unique
+  password        String
+  name            String
+  avatar          String?
+  role            String                 @default("user")
+  xp              Int                    @default(0)
+  level           Int                    @default(1)
+  streak          Int                    @default(0)
+  onboarded       Boolean                @default(false)
+  emailVerified   Boolean                @default(false)
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+  assessments     Assessment[]
+  pathways        CareerPathway[]
+  recommendations CareerRecommendation[]
+  chatMessages    ChatMessage[]
+  chatSessions    ChatSession[]
+  learningPlans   LearningPlan[]
+  notifications   Notification[]
+  profile         Profile?
+  resumes         Resume[]
+  skillGaps       SkillGap[]
+  achievements    UserAchievement[]
+  userSkills      UserSkill[]
+}
+
+model Profile {
+  id              String  @id @default(uuid())
+  userId          String  @unique
+  education       String?
+  workExperience  String?
+  interests       String?
+  skills          String?
+  personalityType String?
+  dreamCareers    String?
+  strengths       String?
+  weaknesses      String?
+  values          String?
+  learningStyle   String?
+  hobbies         String?
+  bio             String?
+  location        String?
+  linkedinUrl     String?
+  portfolioUrl    String?
+  careerScore     Int     @default(0)
+  user            User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Assessment {
+  id          String               @id @default(uuid())
+  userId      String
+  type        String
+  title       String
+  status      String               @default("pending")
+  score       Float?
+  maxScore    Float?
+  results     String?
+  cogProfile  String?
+  startedAt   DateTime?
+  completedAt DateTime?
+  createdAt   DateTime             @default(now())
+  user        User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  answers     AssessmentAnswer[]
+  questions   AssessmentQuestion[]
+}
+
+model AssessmentQuestion {
+  id            String             @id @default(uuid())
+  assessmentId  String
+  question      String
+  options       String
+  correctAnswer String?
+  difficulty    Int                @default(1)
+  category      String
+  explanation   String?
+  answers       AssessmentAnswer[]
+  assessment    Assessment         @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+}
+
+model AssessmentAnswer {
+  id           String             @id @default(uuid())
+  assessmentId String
+  questionId   String
+  answer       String
+  isCorrect    Boolean?
+  timeTaken    Int?
+  question     AssessmentQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  assessment   Assessment         @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+}
+
+model Career {
+  id              String                 @id @default(uuid())
+  title           String
+  slug            String                 @unique
+  description     String
+  category        String
+  industry        String
+  salaryMin       Int
+  salaryMax       Int
+  growthRate      Float
+  demandLevel     String
+  automationRisk  Float
+  requiredSkills  String
+  education       String
+  experienceLevel String
+  workStyle       String
+  futureOutlook   String
+  icon            String?
+  color           String?
+  createdAt       DateTime               @default(now())
+  pathways        CareerPathway[]
+  recommendations CareerRecommendation[]
+}
+
+model CareerRecommendation {
+  id               String   @id @default(uuid())
+  userId           String
+  careerId         String
+  matchScore       Float
+  satisfactionProb Float?
+  growthPotential  Float?
+  reasoning        String?
+  salaryPrediction String?
+  createdAt        DateTime @default(now())
+  career           Career   @relation(fields: [careerId], references: [id], onDelete: Cascade)
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Skill {
+  id          String      @id @default(uuid())
+  name        String      @unique
+  category    String
+  description String?
+  demandLevel String      @default("medium")
+  trendScore  Float       @default(50)
+  skillGaps   SkillGap[]
+  userSkills  UserSkill[]
+}
+
+model UserSkill {
+  id          String   @id @default(uuid())
+  userId      String
+  skillId     String
+  proficiency Int      @default(1)
+  verified    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  skill       Skill    @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model SkillGap {
+  id            String   @id @default(uuid())
+  userId        String
+  skillId       String
+  currentLevel  Int      @default(0)
+  requiredLevel Int
+  priority      String   @default("medium")
+  gapScore      Float
+  createdAt     DateTime @default(now())
+  skill         Skill    @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model LearningPlan {
+  id          String   @id @default(uuid())
+  userId      String
+  title       String
+  description String?
+  resources   String
+  timeline    String?
+  progress    Float    @default(0)
+  status      String   @default("active")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ChatSession {
+  id        String        @id @default(uuid())
+  userId    String
+  title     String        @default("New Chat")
+  mode      String        @default("general")
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  messages  ChatMessage[]
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ChatMessage {
+  id        String       @id @default(uuid())
+  userId    String
+  sessionId String?
+  role      String
+  content   String
+  metadata  String?
+  createdAt DateTime     @default(now())
+  session   ChatSession? @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Resume {
+  id        String   @id @default(uuid())
+  userId    String
+  title     String
+  template  String   @default("modern")
+  content   String
+  atsScore  Float?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model CareerPathway {
+  id         String   @id @default(uuid())
+  userId     String
+  careerId   String?
+  title      String
+  milestones String
+  timeframe  String
+  status     String   @default("active")
+  createdAt  DateTime @default(now())
+  career     Career?  @relation(fields: [careerId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Achievement {
+  id          String            @id @default(uuid())
+  title       String            @unique
+  description String
+  icon        String
+  xpReward    Int               @default(100)
+  category    String
+  condition   String
+  users       UserAchievement[]
+}
+
+model UserAchievement {
+  id            String      @id @default(uuid())
+  userId        String
+  achievementId String
+  earnedAt      DateTime    @default(now())
+  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  title     String
+  message   String
+  type      String
+  read      Boolean  @default(false)
+  actionUrl String?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model IndustryTrend {
+  id          String   @id @default(uuid())
+  industry    String
+  title       String
+  description String
+  trendType   String
+  impactScore Float
+  data        String
+  predictions String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
