@@ -4,12 +4,7 @@ import { BookOpen, Video, PlayCircle, ExternalLink, Star, Clock, CheckCircle2, C
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuthStore } from "@/store";
 
-declare global {
-  interface Window {
-    YT: any;
-    onYouTubeIframeAPIReady: () => void;
-  }
-}
+// Force Rebuild: 2026-05-08-23-28
 
 import { curatedCourses, Course } from "./courses";
 
