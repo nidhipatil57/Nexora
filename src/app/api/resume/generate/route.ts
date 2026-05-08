@@ -19,15 +19,17 @@ Languages: ${languages}
 Experience: ${experience}
 Education: ${education}
 Projects: ${projects || "Not provided"}
-Template Style: ${template}
 
+Writing Tone/Style: ${template} (e.g., Creative = bold & narrative, Corporate = professional & metrics-driven, Minimal = concise & direct)
+
+CRITICAL: Rewrite the content specifically in the chosen "${template}" tone.
 Respond ONLY with valid JSON:
 {
-  "summary": "2-3 sentence professional summary",
-  "experience": [{"title": "Job Title", "company": "Company", "period": "Date Range", "bullets": ["achievement1", "achievement2", "achievement3"]}],
+  "summary": "Professional summary in ${template} tone",
+  "experience": [{"title": "Job Title", "company": "Company", "period": "Date Range", "bullets": ["achievement rewritten in ${template} style"]}],
   "education": [{"degree": "Degree", "institution": "School", "year": "Year"}],
   "skills": ["skill1", "skill2"],
-  "projects": [{"name": "Project", "description": "Brief description", "tech": ["tech1"]}],
+  "projects": [{"name": "Project", "description": "Description in ${template} style", "tech": ["tech1"]}],
   "languages": ["language1"],
   "certifications": []
 }`;
