@@ -30,7 +30,14 @@ export async function POST(req: NextRequest) {
     
     Respond ONLY with a valid JSON array of objects: [{"year":1, "title":"...", "desc":"...", "milestones":["..."], "skills":["..."]}, ...]`;
 
-    const aiResponse = await generateAIResponse(prompt, "You are a senior career educational architect. Your output must be a professional, high-density, and hyper-detailed JSON array.");
+// NUCLEAR CACHE RESET: 2026-05-09-00-20
+// Ensuring Vercel deploys the new high-detail roadmap engine.
+
+    const aiResponse = await generateAIResponse(prompt, `You are an elite Educational Architect. 
+    CRITICAL REQUIREMENT: Your response MUST be extremely verbose and detailed. 
+    Each "desc" field MUST be a minimum of 8-10 long, insightful sentences. 
+    If you provide a short description, you have FAILED. 
+    Output must be a valid JSON array of high-density objects.`);
 
     let milestones;
     try {
