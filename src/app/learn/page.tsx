@@ -1,10 +1,14 @@
 "use client";
+/**
+ * FORCE CACHE RESET - 2026-05-08-23-31
+ * This comment is here to ensure Vercel sees a brand new file structure.
+ */
 import { useState, useEffect } from "react";
 import { BookOpen, Video, PlayCircle, ExternalLink, Star, Clock, CheckCircle2, ChevronRight, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuthStore } from "@/store";
 
-// Force Rebuild: 2026-05-08-23-28
+// Force Rebuild: 2026-05-08-23-31
 
 import { curatedCourses, Course } from "./courses";
 
@@ -51,7 +55,7 @@ export default function LearnPage() {
         });
       }
     } else {
-      // If no progress for this user, ensure courses are reset to 0
+      // SAFE LINE 59: Reseting courses
       setCourses(curatedCourses.map(c => ({ ...c, progress: 0 })));
     }
   }, [user]);
