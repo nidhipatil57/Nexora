@@ -15,6 +15,7 @@ interface ResumeData {
 }
 
 const templates = [
+  { id: "premium", name: "Premium", desc: "Dual-column executive layout", color: "from-slate-800 to-slate-900" },
   { id: "modern", name: "Modern", desc: "Clean lines with accent colors", color: "from-indigo-500 to-blue-600" },
   { id: "minimal", name: "Minimal", desc: "Simple and elegant", color: "from-slate-500 to-slate-700" },
   { id: "creative", name: "Creative", desc: "Bold layout with personality", color: "from-rose-500 to-pink-600" },
@@ -65,12 +66,22 @@ export default function ResumePage() {
     const printWindow = window.open("", "_blank");
     if (!printWindow) return;
     printWindow.document.write(`<html><head><title>${form.name} - Resume</title><style>
-      body{font-family:system-ui,-apple-system,sans-serif;margin:0;padding:40px;color:#1a1a2e;line-height:1.6}
-      h1{font-size:28px;margin:0 0 4px}h2{font-size:14px;text-transform:uppercase;letter-spacing:1.5px;border-bottom:2px solid #1a1a2e;padding-bottom:4px;margin:20px 0 10px}
-      h3{font-size:15px;margin:0}p{margin:4px 0;font-size:13px}ul{margin:4px 0;padding-left:20px}li{font-size:13px;margin:2px 0}
-      .subtitle{color:#666;font-size:14px}.contact{color:#666;font-size:12px;display:flex;gap:16px;flex-wrap:wrap}
-      .skill-tag{display:inline-block;background:#f0f0f5;padding:2px 10px;border-radius:4px;font-size:12px;margin:2px}
-      .period{color:#888;font-size:12px;float:right}
+      body{font-family:system-ui,-apple-system,sans-serif;margin:0;padding:0;color:#1a1a2e;line-height:1.6}
+      .premium-container{display:flex;min-height:100vh}
+      .premium-sidebar{width:250px;background:#f0f2f5;padding:40px 20px;border-right:1px solid #ddd}
+      .premium-main{flex:1;background:white;padding:0}
+      .premium-header{background:#2c3e50;color:white;padding:40px 60px;text-align:left}
+      .premium-content{padding:40px 60px}
+      .section-item{position:relative;padding-left:30px;margin-bottom:30px;border-left:1px solid #ddd}
+      .section-dot{position:absolute;left:-6px;top:4px;width:10px;height:10px;background:#2c3e50;border-radius:50%}
+      h1{font-size:32px;margin:0;text-transform:uppercase;letter-spacing:2px}
+      h2{font-size:14px;text-transform:uppercase;letter-spacing:1.5px;color:#2c3e50;margin-bottom:15px;border-bottom:1.5px solid #2c3e50;display:inline-block;padding-bottom:2px}
+      .sidebar-section{margin-bottom:35px}
+      .sidebar-title{font-size:12px;font-weight:bold;text-transform:uppercase;letter-spacing:1px;border-bottom:1px solid #ccc;margin-bottom:10px;padding-bottom:2px}
+      .sidebar-text{font-size:11px;color:#555;margin-bottom:5px}
+      .main-text{font-size:13px;color:#333;margin-bottom:10px}
+      ul{margin:4px 0;padding-left:15px}li{font-size:12px;margin:4px 0}
+      .no-print{display:none}
     </style></head><body>${previewRef.current.innerHTML}</body></html>`);
     printWindow.document.close();
     printWindow.print();
@@ -129,7 +140,7 @@ export default function ResumePage() {
       {step === 2 && (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
           <h2 className="text-xl font-bold text-white mb-6">Choose a Template</h2>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
             {templates.map(t => (
               <button key={t.id} onClick={() => setSelectedTemplate(t.id)} className={`p-4 rounded-xl border-2 transition-all text-left ${selectedTemplate === t.id ? "border-indigo-500/60 bg-indigo-500/10" : "border-white/10 bg-white/5 hover:border-white/20"}`}>
                 <div className={`h-24 rounded-lg bg-gradient-to-br ${t.color} mb-3 flex items-center justify-center`}>
@@ -166,77 +177,161 @@ export default function ResumePage() {
 
           <div className="glass-card p-4 bg-slate-900/50">
             <div className="flex items-center gap-2 mb-3"><Eye className="w-4 h-4 text-slate-400" /><span className="text-sm font-medium text-slate-400">Live Preview</span>{editing && <span className="text-xs text-amber-400 ml-2">✏️ Edit mode — click text to edit</span>}</div>
-            <div ref={previewRef} className="bg-white rounded-lg p-8 sm:p-12 shadow-2xl text-slate-800 min-h-[600px]" contentEditable={editing} suppressContentEditableWarning>
-              {/* Header */}
-              <div className={`border-b-2 pb-4 mb-6 ${selectedTemplate === "creative" ? "border-rose-500" : selectedTemplate === "corporate" ? "border-slate-800" : selectedTemplate === "minimal" ? "border-slate-300" : "border-indigo-500"}`}>
-                <h1 className="text-3xl font-bold text-slate-900 mb-1">{form.name}</h1>
-                <div className="flex gap-4 text-xs text-slate-500 mt-2 flex-wrap">
-                  {form.email && <span>{form.email}</span>}
-                  {form.phone && <span>{form.phone}</span>}
-                  {form.location && <span>{form.location}</span>}
-                </div>
-              </div>
-              {/* Summary */}
-              <div className="mb-6">
-                <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-2">Summary</h2>
-                <p className="text-sm text-slate-700 leading-relaxed">{resumeData.summary}</p>
-              </div>
-              {/* Experience */}
-              {resumeData.experience?.length > 0 && (
-                <div className="mb-6">
-                  <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-2">Experience</h2>
-                  {resumeData.experience.map((exp, i) => (
-                    <div key={i} className="mb-4">
-                      <div className="flex justify-between items-baseline mb-1">
-                        <h3 className="font-bold text-slate-800">{exp.title} — {exp.company}</h3>
-                        <span className="text-xs text-slate-500 font-medium">{exp.period}</span>
+            
+            <div ref={previewRef} className="bg-white rounded-lg shadow-2xl text-slate-800 min-h-[600px] overflow-hidden" contentEditable={editing} suppressContentEditableWarning>
+              {selectedTemplate === "premium" ? (
+                <div className="premium-container" style={{ display: 'flex', minHeight: '100%' }}>
+                  {/* Sidebar */}
+                  <div className="premium-sidebar" style={{ width: '250px', background: '#f0f2f5', padding: '40px 20px', borderRight: '1px solid #ddd' }}>
+                    <div style={{ width: '120px', height: '120px', borderRadius: '50%', background: '#ddd', margin: '0 auto 30px' }}></div>
+                    
+                    <div className="sidebar-section" style={{ marginBottom: '30px' }}>
+                      <div className="sidebar-title" style={{ fontSize: '12px', fontWeight: 'bold', textTransform: 'uppercase', borderBottom: '1px solid #ccc', marginBottom: '10px' }}>Contact</div>
+                      <div className="sidebar-text" style={{ fontSize: '11px', marginBottom: '5px' }}>📞 {form.phone}</div>
+                      <div className="sidebar-text" style={{ fontSize: '11px', marginBottom: '5px' }}>✉️ {form.email}</div>
+                      <div className="sidebar-text" style={{ fontSize: '11px', marginBottom: '5px' }}>📍 {form.location}</div>
+                    </div>
+
+                    {resumeData.certifications?.length > 0 && (
+                      <div className="sidebar-section" style={{ marginBottom: '30px' }}>
+                        <div className="sidebar-title" style={{ fontSize: '12px', fontWeight: 'bold', textTransform: 'uppercase', borderBottom: '1px solid #ccc', marginBottom: '10px' }}>Certifications</div>
+                        {resumeData.certifications.map((c, i) => (
+                          <div key={i} className="sidebar-text" style={{ fontSize: '11px', marginBottom: '8px' }}>• {c}</div>
+                        ))}
                       </div>
-                      <ul className="list-disc list-outside ml-4 text-sm text-slate-700 space-y-1">
-                        {exp.bullets.map((b, j) => <li key={j}>{b}</li>)}
-                      </ul>
+                    )}
+
+                    {resumeData.languages?.length > 0 && (
+                      <div className="sidebar-section" style={{ marginBottom: '30px' }}>
+                        <div className="sidebar-title" style={{ fontSize: '12px', fontWeight: 'bold', textTransform: 'uppercase', borderBottom: '1px solid #ccc', marginBottom: '10px' }}>Languages</div>
+                        {resumeData.languages.map((l, i) => (
+                          <div key={i} className="sidebar-text" style={{ fontSize: '11px', marginBottom: '5px' }}>• {l}</div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Main Content */}
+                  <div className="premium-main" style={{ flex: 1, background: 'white' }}>
+                    <div className="premium-header" style={{ background: '#2c3e50', color: 'white', padding: '40px 60px' }}>
+                      <h1 style={{ fontSize: '32px', margin: 0 }}>{form.name}</h1>
+                      <div style={{ fontSize: '14px', textTransform: 'uppercase', opacity: 0.8, marginTop: '5px' }}>Computer Science Graduate</div>
                     </div>
-                  ))}
-                </div>
-              )}
-              {/* Education */}
-              {resumeData.education?.length > 0 && (
-                <div className="mb-6">
-                  <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-2">Education</h2>
-                  {resumeData.education.map((edu, i) => (
-                    <div key={i} className="flex justify-between mb-1">
-                      <span className="text-sm text-slate-800 font-medium">{edu.degree} — {edu.institution}</span>
-                      <span className="text-xs text-slate-500">{edu.year}</span>
+
+                    <div className="premium-content" style={{ padding: '40px 60px' }}>
+                      <div className="section-item" style={{ position: 'relative', paddingLeft: '30px', marginBottom: '30px', borderLeft: '1px solid #ddd' }}>
+                        <div className="section-dot" style={{ position: 'absolute', left: '-6px', top: '4px', width: '10px', height: '10px', background: '#2c3e50', borderRadius: '50%' }}></div>
+                        <h2 style={{ fontSize: '14px', textTransform: 'uppercase', borderBottom: '1.5px solid #2c3e50', marginBottom: '10px' }}>Career Objective</h2>
+                        <p style={{ fontSize: '13px', color: '#333' }}>{resumeData.summary}</p>
+                      </div>
+
+                      <div className="section-item" style={{ position: 'relative', paddingLeft: '30px', marginBottom: '30px', borderLeft: '1px solid #ddd' }}>
+                        <div className="section-dot" style={{ position: 'absolute', left: '-6px', top: '4px', width: '10px', height: '10px', background: '#2c3e50', borderRadius: '50%' }}></div>
+                        <h2 style={{ fontSize: '14px', textTransform: 'uppercase', borderBottom: '1.5px solid #2c3e50', marginBottom: '10px' }}>Key Skills</h2>
+                        <ul style={{ paddingLeft: '15px' }}>
+                          {resumeData.skills.map((s, i) => <li key={i} style={{ fontSize: '13px', marginBottom: '5px' }}>{s}</li>)}
+                        </ul>
+                      </div>
+
+                      <div className="section-item" style={{ position: 'relative', paddingLeft: '30px', marginBottom: '30px', borderLeft: '1px solid #ddd' }}>
+                        <div className="section-dot" style={{ position: 'absolute', left: '-6px', top: '4px', width: '10px', height: '10px', background: '#2c3e50', borderRadius: '50%' }}></div>
+                        <h2 style={{ fontSize: '14px', textTransform: 'uppercase', borderBottom: '1.5px solid #2c3e50', marginBottom: '10px' }}>Education</h2>
+                        {resumeData.education.map((edu, i) => (
+                          <div key={i} style={{ marginBottom: '10px' }}>
+                            <div style={{ fontWeight: 'bold', fontSize: '13px' }}>{edu.degree}</div>
+                            <div style={{ fontSize: '12px', color: '#666' }}>{edu.institution} | {edu.year}</div>
+                          </div>
+                        ))}
+                      </div>
+
+                      {resumeData.projects?.length > 0 && (
+                        <div className="section-item" style={{ position: 'relative', paddingLeft: '30px', marginBottom: '30px', borderLeft: '1px solid #ddd' }}>
+                          <div className="section-dot" style={{ position: 'absolute', left: '-6px', top: '4px', width: '10px', height: '10px', background: '#2c3e50', borderRadius: '50%' }}></div>
+                          <h2 style={{ fontSize: '14px', textTransform: 'uppercase', borderBottom: '1.5px solid #2c3e50', marginBottom: '10px' }}>Academic Projects</h2>
+                          {resumeData.projects.map((p, i) => (
+                            <div key={i} style={{ marginBottom: '15px' }}>
+                              <div style={{ fontWeight: 'bold', fontSize: '13px' }}>{p.name}</div>
+                              <p style={{ fontSize: '12px', color: '#555', margin: '5px 0' }}>{p.description}</p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                  ))}
+                  </div>
                 </div>
-              )}
-              {/* Skills */}
-              <div className="mb-6">
-                <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-2">Skills</h2>
-                <div className="flex flex-wrap gap-2">
-                  {resumeData.skills.map(s => <span key={s} className="px-2 py-1 bg-slate-100 text-slate-700 text-xs rounded font-medium">{s}</span>)}
-                </div>
-              </div>
-              {/* Projects */}
-              {resumeData.projects?.length > 0 && (
-                <div className="mb-6">
-                  <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-2">Projects</h2>
-                  {resumeData.projects.map((p, i) => (
-                    <div key={i} className="mb-2">
-                      <h3 className="font-bold text-slate-800 text-sm">{p.name}</h3>
-                      <p className="text-xs text-slate-600">{p.description}</p>
+              ) : (
+                <div className="p-8 sm:p-12">
+                  {/* Header */}
+                  <div className={`border-b-2 pb-4 mb-6 ${selectedTemplate === "creative" ? "border-rose-500" : selectedTemplate === "corporate" ? "border-slate-800" : selectedTemplate === "minimal" ? "border-slate-300" : "border-indigo-500"}`}>
+                    <h1 className="text-3xl font-bold text-slate-900 mb-1">{form.name}</h1>
+                    <div className="flex gap-4 text-xs text-slate-500 mt-2 flex-wrap">
+                      {form.email && <span>{form.email}</span>}
+                      {form.phone && <span>{form.phone}</span>}
+                      {form.location && <span>{form.location}</span>}
                     </div>
-                  ))}
+                  </div>
+                  {/* Summary */}
+                  <div className="mb-6">
+                    <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-2">Summary</h2>
+                    <p className="text-sm text-slate-700 leading-relaxed">{resumeData.summary}</p>
+                  </div>
+                  {/* Experience */}
+                  {resumeData.experience?.length > 0 && (
+                    <div className="mb-6">
+                      <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-2">Experience</h2>
+                      {resumeData.experience.map((exp, i) => (
+                        <div key={i} className="mb-4">
+                          <div className="flex justify-between items-baseline mb-1">
+                            <h3 className="font-bold text-slate-800">{exp.title} — {exp.company}</h3>
+                            <span className="text-xs text-slate-500 font-medium">{exp.period}</span>
+                          </div>
+                          <ul className="list-disc list-outside ml-4 text-sm text-slate-700 space-y-1">
+                            {exp.bullets.map((b, j) => <li key={j}>{b}</li>)}
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {/* Education */}
+                  {resumeData.education?.length > 0 && (
+                    <div className="mb-6">
+                      <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-2">Education</h2>
+                      {resumeData.education.map((edu, i) => (
+                        <div key={i} className="flex justify-between mb-1">
+                          <span className="text-sm text-slate-800 font-medium">{edu.degree} — {edu.institution}</span>
+                          <span className="text-xs text-slate-500">{edu.year}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {/* Skills */}
+                  <div className="mb-6">
+                    <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-2">Skills</h2>
+                    <div className="flex flex-wrap gap-2">
+                      {resumeData.skills.map(s => <span key={s} className="px-2 py-1 bg-slate-100 text-slate-700 text-xs rounded font-medium">{s}</span>)}
+                    </div>
+                  </div>
+                  {/* Projects */}
+                  {resumeData.projects?.length > 0 && (
+                    <div className="mb-6">
+                      <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-2">Projects</h2>
+                      {resumeData.projects.map((p, i) => (
+                        <div key={i} className="mb-2">
+                          <h3 className="font-bold text-slate-800 text-sm">{p.name}</h3>
+                          <p className="text-xs text-slate-600">{p.description}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {/* Languages */}
+                  {resumeData.languages?.length > 0 && (
+                    <div>
+                      <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-2">Languages</h2>
+                      <p className="text-sm text-slate-700">{resumeData.languages.join(", ")}</p>
+                    </div>
+                  )}
                 </div>
               )}
-              {/* Languages */}
-              {resumeData.languages?.length > 0 && (
-                <div>
-                  <h2 className="text-sm font-bold text-slate-900 uppercase tracking-wider mb-2">Languages</h2>
-                  <p className="text-sm text-slate-700">{resumeData.languages.join(", ")}</p>
-                </div>
-              )}
-            </div>
           </div>
         </motion.div>
       )}
