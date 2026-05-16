@@ -4,7 +4,7 @@ import prisma from "@/lib/db";
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { sessionId: string } }
+  { params }: { params: Promise<{ sessionId: string }> }
 ) {
   try {
     const auth = getUserFromRequest(req);
@@ -33,7 +33,7 @@ export async function DELETE(
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { sessionId: string } }
+  { params }: { params: Promise<{ sessionId: string }> }
 ) {
   try {
     const auth = getUserFromRequest(req);
