@@ -70,9 +70,7 @@ function Hero() {
       
       <div className="relative z-10 w-full max-w-5xl mx-auto px-6 text-center flex flex-col items-center">
         <motion.div variants={fadeUp} initial="hidden" animate="visible" transition={{ duration: 0.8 }}>
-          <div className="mb-4 text-[10px] text-emerald-400 font-mono tracking-widest uppercase bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full inline-block">
-            Vercel Sync Check: 2026-05-09-00-28
-          </div>
+
           <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/[0.03] border border-white/10 text-slate-300 text-xs sm:text-sm font-medium mb-10 backdrop-blur-md">
             <Sparkles className="w-3.5 h-3.5 text-[#06B6D4]" /> Introducing Nexora AI — your personal Tech Career Assistant
           </div>
