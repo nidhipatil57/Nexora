@@ -56,12 +56,9 @@ export async function generateAIResponse(prompt: string | any[], systemInstructi
 
 function cleanAIResponse(text: string): string {
   return text
-    .replace(/```json/g, "")
-    .replace(/```/g, "")
-    .replace(/\*\*/g, "") // Remove bold stars
-    .replace(/\*/g, "")   // Remove single stars
-    .replace(/#/g, "")    // Remove headers
-    .replace(/ - /g, "\n• ") // Convert dashes to bullets for better readability if needed
+    .replace(/```json\n?/g, "")
+    .replace(/```\n?/g, "")
+    .replace(/^#{1,6}\s/gm, "") // Only remove heading markers at line start, not # inside content
     .trim();
 }
 

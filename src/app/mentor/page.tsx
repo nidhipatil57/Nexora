@@ -4,6 +4,17 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Send, Bot, User, Sparkles, AlertCircle, Plus, MessageSquare, Edit2, Trash2, Check, X, MoreVertical } from "lucide-react";
 import { useAuthStore } from "@/store";
 
+// Helper to render **bold** text within chat messages
+function renderBoldText(text: string) {
+  const parts = text.split(/(\*\*.*?\*\*)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith("**") && part.endsWith("**")) {
+      return <strong key={i} className="font-semibold text-white">{part.slice(2, -2)}</strong>;
+    }
+    return <span key={i}>{part}</span>;
+  });
+}
+
 interface Message {
   id: string;
   role: "user" | "assistant";
@@ -277,15 +288,22 @@ export default function MentorPage() {
                   {m.role === "user" ? <User className="w-4 h-4 text-white" /> : <Bot className="w-4 h-4 text-white" />}
                 </div>
                 <div className={`chat-bubble ${m.role}`}>
-                  {/* Basic markdown parsing for bold text and lists */}
                   {m.content.split('\n').map((line, i) => {
-                    if (line.startsWith('- ') || line.startsWith('* ')) {
-                      return <li key={i} className="ml-4 list-disc my-1">{line.substring(2)}</li>;
+                    const trimmed = line.trim();
+                    // Empty line = spacer
+                    if (!trimmed) return <div key={i} className="h-2" />;
+                    // Bullet list items (- or *)
+                    if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+                      return <div key={i} className="flex items-start gap-2 my-1 ml-2"><span className="text-indigo-400 mt-0.5">•</span><span>{renderBoldText(trimmed.substring(2))}</span></div>;
                     }
-                    if (line.match(/^\d+\.\s/)) {
-                      return <li key={i} className="ml-4 list-decimal my-1">{line.replace(/^\d+\.\s/, '')}</li>;
+                    // Numbered list items
+                    if (trimmed.match(/^\d+[\.\)]\s/)) {
+                      const num = trimmed.match(/^(\d+)[\.\)]\s/)![1];
+                      const text = trimmed.replace(/^\d+[\.\)]\s/, '');
+                      return <div key={i} className="flex items-start gap-2 my-1 ml-2"><span className="text-indigo-400 font-semibold min-w-[1.2rem]">{num}.</span><span>{renderBoldText(text)}</span></div>;
                     }
-                    return <p key={i} className="my-1">{line}</p>;
+                    // Regular paragraph
+                    return <p key={i} className="my-1 leading-relaxed">{renderBoldText(trimmed)}</p>;
                   })}
                 </div>
               </motion.div>
