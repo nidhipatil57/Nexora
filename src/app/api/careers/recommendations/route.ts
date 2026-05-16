@@ -8,8 +8,7 @@ export async function GET(req: NextRequest) {
     const auth = getUserFromRequest(req);
     if (!auth) return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
 
-    // CACHE BUSTER: 2026-05-09-00-24
-    // Check for existing recommendations (and de-duplicate just in case)
+    // Check for existing recommendations (de-duplicated)
     const existing = await prisma.careerRecommendation.findMany({
       where: { userId: auth.userId },
       include: { career: true },
@@ -17,7 +16,6 @@ export async function GET(req: NextRequest) {
     });
 
     if (existing.length > 0) {
-      // Safety Shield: Only return unique titles
       const unique = [];
       const seen = new Set();
       for (const item of existing) {
@@ -29,45 +27,64 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ success: true, recommendations: unique });
     }
 
-    // Generate new recommendations
+    // Fetch user profile with all onboarding data
     const profile = await prisma.profile.findUnique({ where: { userId: auth.userId } });
     const user = await prisma.user.findUnique({ where: { id: auth.userId } });
 
-    const aiResponse = await generateCareerRecommendations({
+    // Parse all profile fields for the AI prompt
+    const safeJsonParse = (val: string | null | undefined, fallback: any = null) => {
+      if (!val) return fallback;
+      try { return JSON.parse(val); } catch { return fallback; }
+    };
+
+    const enrichedProfile = {
       name: user?.name,
-      education: profile?.education ? JSON.parse(profile.education) : null,
-      interests: profile?.interests ? JSON.parse(profile.interests) : null,
-      skills: profile?.skills ? JSON.parse(profile.skills) : null,
-      personalityType: profile?.personalityType,
-      dreamCareers: profile?.dreamCareers ? JSON.parse(profile.dreamCareers) : null,
-    });
+      experience: safeJsonParse(profile?.education, {}),
+      domains: safeJsonParse(profile?.interests, []),
+      tools: safeJsonParse(profile?.skills, []),
+      workStyle: safeJsonParse(profile?.personalityType, {}),
+      dreamRoles: safeJsonParse(profile?.dreamCareers, []),
+      projectTypes: safeJsonParse(profile?.strengths, []),
+      careerGoals: safeJsonParse(profile?.values, []),
+    };
+
+    const aiResponse = await generateCareerRecommendations(enrichedProfile);
 
     let recommendations;
     try {
-      recommendations = JSON.parse(aiResponse);
+      // Try to parse AI response - strip any non-JSON prefix/suffix
+      let cleaned = aiResponse.trim();
+      const jsonStart = cleaned.indexOf("[");
+      const jsonEnd = cleaned.lastIndexOf("]");
+      if (jsonStart !== -1 && jsonEnd !== -1) {
+        cleaned = cleaned.substring(jsonStart, jsonEnd + 1);
+      }
+      recommendations = JSON.parse(cleaned);
+      if (!Array.isArray(recommendations)) throw new Error("Not an array");
     } catch {
-      // Intelligent fallback: Use user's dream careers if AI fails
-      const dreamCareers = profile?.dreamCareers ? JSON.parse(profile.dreamCareers) : [];
+      // Fallback: use dream careers and domains to build recommendations
+      const dreamCareers = safeJsonParse(profile?.dreamCareers, []);
+      const userTools = safeJsonParse(profile?.skills, []);
       if (dreamCareers.length > 0) {
-        recommendations = dreamCareers.map((title: string) => ({
+        recommendations = dreamCareers.slice(0, 6).map((title: string, i: number) => ({
           title,
-          matchScore: 95,
-          description: `A career pathway specifically aligned with your interest in ${title}.`,
+          matchScore: 95 - i * 2,
+          description: `A career pathway specifically aligned with your interest in ${title}, leveraging your skills in ${userTools.slice(0, 3).join(", ") || "your domain"}.`,
           salaryRange: "$70,000 - $160,000",
           growthPotential: "high",
-          requiredSkills: profile?.skills ? JSON.parse(profile.skills) : ["Industry Expertise"],
-          reasoning: "Directly matches your stated dream career in onboarding."
+          requiredSkills: userTools.slice(0, 5).length > 0 ? userTools.slice(0, 5) : ["Industry Expertise"],
+          reasoning: "Directly matches your stated dream career from onboarding."
         }));
       } else {
         recommendations = [
-          { title: "Software Engineer", matchScore: 92, description: "Build innovative software", salaryRange: "$80K-$180K", growthPotential: "high", requiredSkills: ["Programming", "Problem Solving"], reasoning: "Strong technical aptitude" },
-          { title: "Data Scientist", matchScore: 88, description: "Unlock insights from data", salaryRange: "$90K-$170K", growthPotential: "high", requiredSkills: ["Python", "Statistics", "ML"], reasoning: "Analytical mindset" },
-          { title: "Product Manager", matchScore: 85, description: "Lead product strategy", salaryRange: "$100K-$190K", growthPotential: "high", requiredSkills: ["Strategy", "Communication"], reasoning: "Leadership potential" },
+          { title: "Software Engineer", matchScore: 90, description: "Build innovative software solutions", salaryRange: "$80K-$180K", growthPotential: "high", requiredSkills: ["Programming", "Problem Solving", "System Design"], reasoning: "Strong technical foundation" },
+          { title: "Data Scientist", matchScore: 86, description: "Unlock insights from data", salaryRange: "$90K-$170K", growthPotential: "high", requiredSkills: ["Python", "Statistics", "ML"], reasoning: "Analytical aptitude" },
+          { title: "DevOps Engineer", matchScore: 82, description: "Automate and scale infrastructure", salaryRange: "$85K-$175K", growthPotential: "high", requiredSkills: ["Docker", "CI/CD", "Cloud"], reasoning: "Systems thinking" },
         ];
       }
     }
 
-    // Store recommendations with career entries (De-duplicated)
+    // Store recommendations with career entries (de-duplicated)
     const stored = [];
     const seenTitles = new Set();
     

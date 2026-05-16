@@ -9,35 +9,35 @@ export async function POST(req: NextRequest) {
 
     const data = await req.json();
 
-    // Update profile with onboarding data
+    // Map new onboarding fields to existing Profile columns (all stored as JSON strings)
     await prisma.profile.upsert({
       where: { userId: auth.userId },
       update: {
-        education: JSON.stringify(data.education),
-        interests: JSON.stringify(data.interests),
-        skills: JSON.stringify(data.skills),
-        personalityType: data.personalityType,
-        dreamCareers: JSON.stringify(data.dreamCareers),
-        strengths: JSON.stringify(data.strengths),
-        hobbies: JSON.stringify(data.hobbies),
-        learningStyle: data.learningStyle,
+        education: JSON.stringify(data.experience),         // { level, yearsOfExp, fieldOfStudy }
+        interests: JSON.stringify(data.domains),             // tech domain IDs
+        skills: JSON.stringify(data.tools),                  // programming languages & tools
+        personalityType: JSON.stringify(data.workStyle),     // { teamPref, environment, orgType }
+        dreamCareers: JSON.stringify(data.dreamRoles),       // dream role titles
+        strengths: JSON.stringify(data.projectTypes),        // project interest IDs
+        values: JSON.stringify(data.careerGoals),            // career goal IDs
+        learningStyle: data.workStyle?.environment || "hybrid",
         careerScore: 65,
       },
       create: {
         userId: auth.userId,
-        education: JSON.stringify(data.education),
-        interests: JSON.stringify(data.interests),
-        skills: JSON.stringify(data.skills),
-        personalityType: data.personalityType,
-        dreamCareers: JSON.stringify(data.dreamCareers),
-        strengths: JSON.stringify(data.strengths),
-        hobbies: JSON.stringify(data.hobbies),
-        learningStyle: data.learningStyle,
+        education: JSON.stringify(data.experience),
+        interests: JSON.stringify(data.domains),
+        skills: JSON.stringify(data.tools),
+        personalityType: JSON.stringify(data.workStyle),
+        dreamCareers: JSON.stringify(data.dreamRoles),
+        strengths: JSON.stringify(data.projectTypes),
+        values: JSON.stringify(data.careerGoals),
+        learningStyle: data.workStyle?.environment || "hybrid",
         careerScore: 65,
       },
     });
 
-    // Clear existing recommendations to ensure fresh ones based on new onboarding data
+    // Clear existing recommendations so fresh ones are generated based on new data
     await prisma.careerRecommendation.deleteMany({
       where: { userId: auth.userId }
     });
